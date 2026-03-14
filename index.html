@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #2c3e50; color: white; transition: 0.5s; }
+        .main { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; width: 80%; max-width: 600px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.2); }
+        textarea { width: 100%; border-radius: 10px; padding: 10px; margin-top: 10px; background: rgba(0,0,0,0.3); color: white; border: none; }
+        button { cursor: pointer; padding: 10px 20px; border-radius: 10px; border: none; background: #a29bfe; margin-top: 10px; font-weight: bold; }
+        #timer { font-size: 3rem; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <h1>🎓 ژووری زیرەکی خوێندکار</h1>
+        
+        <div class="card">
+            <h3>⏱️ تایمەری تەرکیز</h3>
+            <div id="timer">25:00</div>
+            <button onclick="startTimer()">دەستپێکردن</button>
+        </div>
+
+        <div class="card">
+            <h3>📝 تێبینی و خشتەی ڕۆژانە</h3>
+            <textarea id="myNotes" rows="10" oninput="localStorage.setItem('notes', this.value)" placeholder="لێرە بنوسە..."></textarea>
+        </div>
+
+        <div class="card">
+            <h3>🎵 میوزیکی هێمن</h3>
+            <audio id="audio" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+            <button onclick="document.getElementById('audio').play()">▶️ لێدان</button>
+            <button onclick="document.getElementById('audio').pause()">⏸️ ڕاگرتن</button>
+        </div>
+    </div>
+
+    <script>
+        // بارکردنی تێبینییەکان
+        document.getElementById('myNotes').value = localStorage.getItem('notes') || "";
+
+        // تایمەر
+        let time = 25 * 60;
+        function startTimer() {
+            setInterval(() => {
+                if(time > 0) {
+                    time--;
+                    let m = Math.floor(time/60);
+                    let s = time%60;
+                    document.getElementById('timer').innerText = m + ":" + (s < 10 ? "0"+s : s);
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
