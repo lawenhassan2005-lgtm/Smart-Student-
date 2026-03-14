@@ -2,54 +2,256 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Student Dashboard</title>
+    <title>Student Pro Dashboard | ژووری خوێندکار</title>
     <style>
-        body { margin: 0; font-family: sans-serif; background: #2c3e50; color: white; transition: 0.5s; }
-        .main { display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; width: 80%; max-width: 600px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.2); }
-        textarea { width: 100%; border-radius: 10px; padding: 10px; margin-top: 10px; background: rgba(0,0,0,0.3); color: white; border: none; }
-        button { cursor: pointer; padding: 10px 20px; border-radius: 10px; border: none; background: #a29bfe; margin-top: 10px; font-weight: bold; }
-        #timer { font-size: 3rem; margin: 10px 0; }
+        :root {
+            --glass: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --primary: #a29bfe;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #2d3436; /* ڕەنگی بنەڕەتی پێش باربوونی وێنە */
+            background-position: center;
+            background-size: cover;
+            transition: background 0.8s ease; /* گۆڕینی وێنە بە نەرمی */
+            color: white;
+            overflow: hidden;
+        }
+
+        /* بەشی لاگین */
+        #login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2000;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            width: 380px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        /* بەشی داشبۆرد */
+        #main-dashboard {
+            display: none;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 20px;
+            width: 95%;
+            height: 90vh;
+            z-index: 10;
+        }
+
+        .panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 25px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        input, textarea, select {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            color: white; padding: 12px; border-radius: 12px;
+            width: 100%; margin-bottom: 15px; box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #2d3436; border: none; padding: 12px;
+            border-radius: 12px; cursor: pointer; font-weight: bold;
+            width: 100%; transition: 0.3s;
+        }
+
+        .btn:hover { background: white; transform: translateY(-2px); }
+
+        /* پاشبنەما و میوزیک */
+        .control-group { margin-top: 20px; }
+        .control-label { display: block; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.8; }
+
+        #timer-display { font-size: 3.5rem; text-align: center; font-weight: bold; margin: 15px 0; color: var(--primary); }
+
+        .todo-item {
+            background: rgba(0,0,0,0.2);
+            padding: 12px; margin-bottom: 8px; border-radius: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
     </style>
 </head>
-<body>
-    <div class="main">
-        <h1>🎓 ژووری زیرەکی خوێندکار</h1>
+<body id="bg-body">
+
+    <div id="login-overlay">
+        <div class="glass-card">
+            <h1 style="margin-bottom: 10px;">بەخێربێیت 🎓</h1>
+            <p style="opacity: 0.7; margin-bottom: 30px;">ژینگەی خوێندنەکەت ئامادە بکە</p>
+            <input type="text" id="username" placeholder="ناوەکەت بنوسە...">
+            <button class="btn" onclick="login()">دەستپێکردن</button>
+        </div>
+    </div>
+
+    <div id="main-dashboard">
         
-        <div class="card">
-            <h3>⏱️ تایمەری تەرکیز</h3>
-            <div id="timer">25:00</div>
-            <button onclick="startTimer()">دەستپێکردن</button>
+        <div class="panel">
+            <h3>🎨 ژینگەی خوێندن</h3>
+            
+            <div class="control-group">
+                <span class="control-label">گۆڕینی پاشبنەما:</span>
+                <select id="bgSelect" onchange="changeBackground()">
+                    <option value="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc">کتێبخانەی ئارام</option>
+                    <option value="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b">چیا و سروشت</option>
+                    <option value="https://images.unsplash.com/photo-1519681393784-d120267933ba">شەوی پڕ ئەستێرە</option>
+                    <option value="https://images.unsplash.com/photo-1528731708534-816fe59f90cb">قاوەخانە</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">میوزیکی لۆ-فای (Lo-Fi):</span>
+                <audio id="bgMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+                <button class="btn" id="musicBtn" onclick="toggleMusic()">🎵 لێدانی میوزیک</button>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h4>✨ دۆخی ئێستا</h4>
+                <div style="font-size: 2rem; display: flex; gap: 15px;">
+                    <span style="cursor:pointer">✍️</span>
+                    <span style="cursor:pointer">☕</span>
+                    <span style="cursor:pointer">🧘</span>
+                </div>
+            </div>
         </div>
 
-        <div class="card">
-            <h3>📝 تێبینی و خشتەی ڕۆژانە</h3>
-            <textarea id="myNotes" rows="10" oninput="localStorage.setItem('notes', this.value)" placeholder="لێرە بنوسە..."></textarea>
+        <div class="panel">
+            <h2 id="welcome-title">سڵاو</h2>
+            <textarea id="notes" rows="18" oninput="saveNotes()" placeholder="لێرە دەست بکە بە نووسینی وانەکانت..."></textarea>
+            <p style="font-size: 0.8rem; opacity: 0.5;">* هەموو نووسینەکانت خۆکار پاشەکەوت دەبن.</p>
         </div>
 
-        <div class="card">
-            <h3>🎵 میوزیکی هێمن</h3>
-            <audio id="audio" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
-            <button onclick="document.getElementById('audio').play()">▶️ لێدان</button>
-            <button onclick="document.getElementById('audio').pause()">⏸️ ڕاگرتن</button>
+        <div class="panel">
+            <div id="timer-display">25:00</div>
+            <button class="btn" style="background: white;" onclick="toggleTimer()" id="timerBtn">دەسپێکردنی تەرکیز</button>
+
+            <h3 style="margin-top: 40px;">✅ کارە گرنگەکان</h3>
+            <input type="text" id="todoInput" placeholder="کارێکی نوێ زیاد بکە...">
+            <button class="btn" onclick="addTodo()">زیادکردن</button>
+            <div id="todoList" style="margin-top: 15px;"></div>
         </div>
     </div>
 
     <script>
-        // بارکردنی تێبینییەکان
-        document.getElementById('myNotes').value = localStorage.getItem('notes') || "";
+        // --- سیستەمی لاگین ---
+        function login() {
+            const name = document.getElementById('username').value;
+            if(name) {
+                localStorage.setItem('stuName', name);
+                initDashboard(name);
+            }
+        }
 
-        // تایمەر
-        let time = 25 * 60;
-        function startTimer() {
-            setInterval(() => {
-                if(time > 0) {
-                    time--;
-                    let m = Math.floor(time/60);
-                    let s = time%60;
-                    document.getElementById('timer').innerText = m + ":" + (s < 10 ? "0"+s : s);
-                }
-            }, 1000);
+        function initDashboard(name) {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-dashboard').style.display = 'grid';
+            document.getElementById('welcome-title').innerText = "خوێندنێکی باش، " + name;
+            changeBackground(); 
+            loadAllData();
+        }
+
+        // --- پاشبنەما و میوزیک ---
+        function changeBackground() {
+            const url = document.getElementById('bgSelect').value;
+            document.getElementById('bg-body').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${url}')`;
+        }
+
+        let musicPlaying = false;
+        function toggleMusic() {
+            const music = document.getElementById('bgMusic');
+            const btn = document.getElementById('musicBtn');
+            if(!musicPlaying) {
+                music.play();
+                btn.innerText = "⏸️ ڕاگرتنی میوزیک";
+            } else {
+                music.pause();
+                btn.innerText = "🎵 لێدانی میوزیک";
+            }
+            musicPlaying = !musicPlaying;
+        }
+
+        // --- سەیڤکردن (LocalStorage) ---
+        function saveNotes() {
+            localStorage.setItem('stuNotes', document.getElementById('notes').value);
+        }
+
+        function loadAllData() {
+            document.getElementById('notes').value = localStorage.getItem('stuNotes') || "";
+            const savedTodos = JSON.parse(localStorage.getItem('stuTodos') || "[]");
+            savedTodos.forEach(t => displayTodo(t));
+        }
+
+        // --- لیستی کارەکان ---
+        let todos = JSON.parse(localStorage.getItem('stuTodos') || "[]");
+        function addTodo() {
+            const task = document.getElementById('todoInput').value;
+            if(!task) return;
+            todos.push(task);
+            localStorage.setItem('stuTodos', JSON.stringify(todos));
+            displayTodo(task);
+            document.getElementById('todoInput').value = "";
+        }
+
+        function displayTodo(text) {
+            const item = document.createElement('div');
+            item.className = 'todo-item';
+            item.innerHTML = `<span>${text}</span> <button onclick="deleteTodo('${text}', this)" style="background:none; border:none; color:#ff7675; cursor:pointer;">سڕینەوە</button>`;
+            document.getElementById('todoList').appendChild(item);
+        }
+
+        function deleteTodo(text, el) {
+            todos = todos.filter(t => t !== text);
+            localStorage.setItem('stuTodos', JSON.stringify(todos));
+            el.parentElement.remove();
+        }
+
+        // --- تایمەری تەرکیز ---
+        let timeLeft = 25 * 60;
+        let timerId = null;
+        function toggleTimer() {
+            const btn = document.getElementById('timerBtn');
+            if(timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                btn.innerText = "بەردەوامبوون";
+            } else {
+                btn.innerText = "ڕاگرتن";
+                timerId = setInterval(() => {
+                    timeLeft--;
+                    let m = Math.floor(timeLeft/60);
+                    let s = timeLeft%60;
+                    document.getElementById('timer-display').innerText = `${m}:${s<10?'0'+s:s}`;
+                    if(timeLeft <= 0) { clearInterval(timerId); alert("کاتی پشوو هات!"); }
+                }, 1000);
+            }
+        }
+
+        // پشکنینی لاگینی پێشوو
+        window.onload = () => {
+            const name = localStorage.getItem('stuName');
+            if(name) initDashboard(name);
         }
     </script>
 </body>
